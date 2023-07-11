@@ -18,4 +18,16 @@ impl<'a> Parser<'a> {
             peek_token,
         }
     }
+
+    fn next_token(&mut self) {
+        self.cur_token = self.peek_token.clone();
+        self.peek_token = self.l.next_token();
+    }
+
+
+    pub fn parse_program(&mut self) {
+        
+
+    }
+
 }
