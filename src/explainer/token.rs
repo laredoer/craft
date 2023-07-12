@@ -13,8 +13,8 @@ pub enum Token {
 
     BANG,  // "!"
     MINUS, // "-"
-    // "("
-    LPAREN,
+
+    LPAREN, // "("
     RPAREN, // ")"
 
     LBRACKET,  // "["
@@ -31,4 +31,9 @@ pub fn lookup_ident(ident: &str) -> Token {
         "false" => Token::FALSE,
         _ => Token::IDENT(ident.to_string()),
     }
+}
+
+#[test]
+fn test_token_eq() {
+    assert!(Token::STRING("hello".to_string()) == Token::STRING("hello".to_string()));
 }
