@@ -1,4 +1,7 @@
-use super::ast::{CallExpression, Expression, Identifier, Program, ShapStatement, Statement};
+use super::ast::{
+    AssignLiteral, Boolean, CallExpression, Expression, Identifier, IntegerLiteral, Program,
+    ShapStatement, Statement, StringLiteral,
+};
 use super::lexer::Lexer;
 use super::token::Token;
 
@@ -65,15 +68,13 @@ impl<'a> Parser<'a> {
         let mut left_expr = self.prefix_parse(self.cur_token.clone()).unwrap();
 
         while !self.peek_token_is(Token::SEMICOLON) {
-            let t = self.peek_token.clone();
-            self.next_token();
-            let infix_expression = self.infix_parse(&t, left_expr);
+            let peek_token = self.peek_token.clone();
+            let infix = self.infix_parse(peek_token.clone(), left_expr);
 
-            if !is_infix_operator(&t) {
-                return infix_expression;
+            if !is_infix_operator(&peek_token) {
+                return infix;
             }
-
-            left_expr = infix_expression;
+            left_expr = infix;
         }
 
         left_expr
@@ -104,13 +105,24 @@ impl<'a> Parser<'a> {
     fn prefix_parse(&mut self, token: Token) -> Option<Expression> {
         match token {
             Token::IDENT(_) => Some(self.parse_identifier()),
+            Token::STRING(_) => Some(self.parse_string_literal()),
+            Token::INT(_) => Some(self.parse_integer_literal()),
+            Token::TRUE => Some(self.parse_boolean()),
+            Token::FALSE => Some(self.parse_boolean()),
             _ => None,
         }
     }
 
-    fn infix_parse(&mut self, token: &Token, left_expression: Expression) -> Expression {
+    fn infix_parse(&mut self, token: Token, left_expression: Expression) -> Expression {
         match token {
-            Token::LPAREN => self.parse_call_expression(left_expression),
+            Token::LPAREN => {
+                self.next_token();
+                self.parse_call_expression(left_expression)
+            }
+            Token::ASSIGN => {
+                self.next_token();
+                self.parse_assignment_expression(left_expression)
+            }
             _ => left_expression,
         }
     }
@@ -118,19 +130,73 @@ impl<'a> Parser<'a> {
     fn parse_identifier(&self) -> Expression {
         Expression::Identifier(Identifier {
             token: self.cur_token.clone(),
-            value: String::from(""),
+            value: if let Token::IDENT(s) = self.cur_token.clone() {
+                s
+            } else {
+                String::from("")
+            },
         })
     }
 
+    fn parse_string_literal(&mut self) -> Expression {
+        let s: StringLiteral = StringLiteral {
+            token: self.cur_token.clone(),
+            value: if let Token::STRING(s) = self.cur_token.clone() {
+                s
+            } else {
+                String::from("")
+            },
+        };
+
+        Expression::StringLiteral(s)
+    }
+
+    fn parse_integer_literal(&mut self) -> Expression {
+        let int = IntegerLiteral {
+            token: self.cur_token.clone(),
+            value: if let Token::INT(s) = self.cur_token.clone() {
+                s
+            } else {
+                String::from("")
+            },
+        };
+
+        Expression::IntegerLiteral(int)
+    }
+
+    fn parse_boolean(&mut self) -> Expression {
+        let b = Boolean {
+            token: self.cur_token.clone(),
+            value: match self.cur_token {
+                Token::TRUE => true,
+                Token::FALSE => false,
+                _ => panic!("boolean expected"),
+            },
+        };
+
+        Expression::Boolean(b)
+    }
+
     fn parse_call_expression(&mut self, function: Expression) -> Expression {
-        let mut call = CallExpression {
+        let call = CallExpression {
             token: self.cur_token.clone(),
             function: Box::new(function),
-            arguments: vec![],
+            arguments: self.parse_expression_list(Token::RPAREN),
         };
-        call.arguments = self.parse_expression_list(Token::RPAREN);
 
         Expression::CallExpression(call)
+    }
+
+    fn parse_assignment_expression(&mut self, left_expression: Expression) -> Expression {
+        let t = self.cur_token.clone();
+        self.next_token();
+        let assignment = AssignLiteral {
+            token: t,
+            name: Box::new(left_expression),
+            expression: Box::new(self.parse_expression()),
+        };
+
+        Expression::AssignLiteral(assignment)
     }
 
     fn peek_token_is(&self, token: Token) -> bool {
@@ -153,17 +219,19 @@ impl<'a> Parser<'a> {
 
 fn is_infix_operator(t: &Token) -> bool {
     match t {
-        Token::RBRACKET | Token::LBRACKET => true,
+        Token::LBRACKET => true,
         _ => false,
     }
 }
 
 #[test]
 fn test_parse() {
-    let input = r#"#[i18n(), debug]; #[clone]"#;
+    let input = r#"#[i18n(zh-CN = "hello", code = 200), Debug]"#;
 
     let l = Lexer::new(input);
     let mut p = Parser::new(l);
 
-    assert!(p.parse_program().statements.len() == 2);
+    let stmt = p.parse_program().statements;
+
+    assert!(stmt.len() == 1);
 }
