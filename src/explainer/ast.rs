@@ -1,5 +1,7 @@
 use crate::explainer::token::Token;
 
+use super::extension::{Extension, Field};
+
 #[derive(Debug)]
 pub struct Program {
     pub statements: Vec<Statement>,
@@ -24,6 +26,62 @@ pub enum Expression {
     ArrayLiteral(ArrayLiteral),
     CallExpression(CallExpression),
     AssignLiteral(AssignLiteral),
+}
+
+impl Expression {
+    pub fn to_extension(&self) -> Option<Extension> {
+        match self {
+            Expression::Identifier(i) => Some(Extension {
+                name: i.value.clone(),
+                ..Default::default()
+            }),
+            Expression::CallExpression(c) => {
+                let mut call = Extension {
+                    ..Default::default()
+                };
+
+                if let Expression::Identifier(i) = c.function.as_ref() {
+                    call.name = i.value.clone();
+                }
+
+                let mut args = vec![];
+                for arg in &c.arguments {
+                    match arg {
+                        Expression::AssignLiteral(i) => {
+                            let field_name = match i.name.as_ref() {
+                                Expression::Identifier(i) => i.value.clone(),
+                                _ => "".to_string(),
+                            };
+
+                            let value = match i.expression.as_ref() {
+                                Expression::StringLiteral(s) => {
+                                    Some((s.value.clone(), "string".to_string()))
+                                }
+                                Expression::IntegerLiteral(i) => {
+                                    Some((i.value.clone(), "int".to_string()))
+                                }
+                                Expression::Boolean(b) => {
+                                    Some((b.value.clone(), "bool".to_string()))
+                                }
+                                _ => None,
+                            }
+                            .unwrap();
+
+                            args.push(Field {
+                                name: field_name,
+                                go_type: value.1,
+                                value: value.0,
+                            });
+                        }
+                        _ => continue,
+                    }
+                }
+                call.args = Some(args);
+                Some(call)
+            }
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -67,5 +125,5 @@ pub struct AssignLiteral {
 #[derive(Debug, PartialEq)]
 pub struct Boolean {
     pub token: Token,
-    pub value: bool,
+    pub value: String,
 }

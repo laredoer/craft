@@ -168,8 +168,8 @@ impl<'a> Parser<'a> {
         let b = Boolean {
             token: self.cur_token.clone(),
             value: match self.cur_token {
-                Token::TRUE => true,
-                Token::FALSE => false,
+                Token::TRUE => true.to_string(),
+                Token::FALSE => false.to_string(),
                 _ => panic!("boolean expected"),
             },
         };
