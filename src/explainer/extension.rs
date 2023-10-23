@@ -18,9 +18,7 @@ pub struct Field {
 pub fn parse_extension(input: String) -> Vec<Extension> {
     let l = Lexer::new(&input);
     let mut p = Parser::new(l);
-
     let stmt = p.parse_program().statements;
-
     let exprs = stmt
         .into_iter()
         .map(|s| match s {
@@ -33,6 +31,5 @@ pub fn parse_extension(input: String) -> Vec<Extension> {
     for expr in &exprs {
         res.push(expr.to_extension().unwrap())
     }
-
     res
 }
