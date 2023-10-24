@@ -1,5 +1,5 @@
-use craft::extend::manager::Extend;
 use craft::explainer::extension::parse_extension;
+use craft::extend::manager::Extend;
 use gosyn::ast::Declaration;
 use gosyn::ast::Expression::{Ident, TypeStruct};
 use gosyn::parse_file;
@@ -42,6 +42,7 @@ fn main() {
                     for spec in type_decl.specs {
                         // 获取注释
                         let comments = spec
+                            .clone()
                             .docs
                             .into_iter()
                             .map(|s| s.text.clone())
@@ -49,10 +50,16 @@ fn main() {
                             .join(" ");
 
                         println!("{}", comments);
-                        let exs = parse_extension(comments);
+                        let exs = parse_extension(comments.into());
+
+                        let i18n_extend = call_dynamic().unwrap();
+
+                        let i18n_extend = unsafe { Box::from_raw(i18n_extend) };
 
                         for ex in exs {
-                            if ex.name == "i18n" {}
+                            if ex.name == "i18n" {
+                                println!("{:?}", i18n_extend.build(spec.clone(), ex.args.unwrap()))
+                            }
                         }
                     }
                 }
@@ -82,9 +89,10 @@ fn read_files_in_directory(folder_path: &Path, file_paths: &mut Vec<PathBuf>) {
 fn call_dynamic() -> Result<*mut dyn Extend, Box<dyn std::error::Error>> {
     unsafe {
         let lib = libloading::Library::new("./bin/libi18n.dylib")?;
-        let func: libloading::Symbol<unsafe extern "C" fn(age: i32) -> *mut dyn Extend> =lib.get(b"old_person")?;
+        let func: libloading::Symbol<unsafe extern "C" fn() -> *mut dyn Extend> =
+            lib.get(b"create_extend")?;
 
-        let ret =  func(12);
+        let ret = func();
         Ok(ret.to_owned())
     }
 }

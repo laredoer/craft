@@ -1,0 +1,12 @@
+/Users/longbridge/craft/libs/i18n/target/release/deps/libgosyn-1de7cf1d21a5c261.rmeta: /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/lib.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/error.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/parser.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/scanner.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/ast.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/token.rs
+
+/Users/longbridge/craft/libs/i18n/target/release/deps/libgosyn-1de7cf1d21a5c261.rlib: /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/lib.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/error.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/parser.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/scanner.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/ast.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/token.rs
+
+/Users/longbridge/craft/libs/i18n/target/release/deps/gosyn-1de7cf1d21a5c261.d: /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/lib.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/error.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/parser.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/scanner.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/ast.rs /Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/token.rs
+
+/Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/lib.rs:
+/Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/error.rs:
+/Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/parser.rs:
+/Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/scanner.rs:
+/Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/ast.rs:
+/Users/longbridge/.cargo/registry/src/index.crates.io-6f17d22bba15001f/gosyn-0.2.5/src/token.rs:
