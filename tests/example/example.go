@@ -4,7 +4,6 @@ package example
 type ProductIDIsEmpty int32
 
 // #[i18n(code = 400, zh-HK = "參數錯誤，stripe 支付編號不能為空", zh-CN = "参数错误，stripe 支付编号不能为空", en = "Parameter error, stripe payment number cannot be empty")]
-// #[Debug]
 type StripePaymentIDError int32
 
 type Hello struct {

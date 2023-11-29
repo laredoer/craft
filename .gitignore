@@ -1,4 +1,5 @@
-/target
+*target
 *.lock
 .DS_Store
 .vscode
+*.dylib

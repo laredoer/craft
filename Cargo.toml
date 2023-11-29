@@ -7,5 +7,3 @@ edition = "2021"
 
 [dependencies]
 gosyn = "0.2.5"
-libloading = "0.8.1"
-

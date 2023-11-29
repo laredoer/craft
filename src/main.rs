@@ -1,11 +1,28 @@
 use craft::explainer::extension::parse_extension;
-use craft::extend::manager::Extend;
 use gosyn::ast::Declaration;
-use gosyn::ast::Expression::{Ident, TypeStruct};
 use gosyn::parse_file;
+use std::collections::HashMap;
 use std::fs;
-use std::ops::Index;
 use std::path::{Path, PathBuf};
+
+use craft::libs::i18n::I18nExtend;
+use craft::plugin::Plugin;
+
+struct Extends {
+    plugins: HashMap<&'static str, Box<dyn Plugin>>,
+}
+
+impl Extends {
+    fn new() -> Extends {
+        let mut e = Extends {
+            plugins: HashMap::new(),
+        };
+
+        let i18n = I18nExtend::new();
+        e.plugins.insert(i18n.name(), Box::new(i18n));
+        e
+    }
+}
 
 fn main() {
     let path = std::env::args()
@@ -14,32 +31,19 @@ fn main() {
         .unwrap();
 
     let directory = Path::new(&path);
-    let mut file_paths = Vec::new();
-    read_files_in_directory(&directory, &mut file_paths);
+    let mut go_file_paths: Vec<PathBuf> = Vec::new();
+    read_gofiles_in_directory(&directory, &mut go_file_paths);
+    let extends = Extends::new();
 
-    for path in file_paths {
+    go_file_paths.iter().for_each(|path| {
         let content = parse_file(path).unwrap();
 
-        for decl in content.decl {
+        let mut file_path_to_content: HashMap<PathBuf, String> = HashMap::new();
+
+        content.decl.into_iter().for_each(|decl| {
             match decl {
                 Declaration::Type(type_decl) => {
-                    // type StripePaymentIDError int32
-
-                    // println!("{:?}", type_decl.specs);
-                    let go_type_name;
-                    let go_type_t;
-                    let go_stmt = type_decl.specs.first().unwrap();
-                    go_type_name = go_stmt.name.name.clone(); // StripePaymentIDError
-
-                    match &go_stmt.typ {
-                        Ident(ide) => {
-                            go_type_t = ide.name.clone(); // int32
-                        }
-                        TypeStruct(ts) => {}
-                        _ => {}
-                    }
-
-                    for spec in type_decl.specs {
+                    type_decl.specs.into_iter().for_each(|spec| {
                         // 获取注释
                         let comments = spec
                             .clone()
@@ -49,33 +53,48 @@ fn main() {
                             .collect::<Vec<String>>()
                             .join(" ");
 
-                        println!("{}", comments);
                         let exs = parse_extension(comments.into());
+                        exs.into_iter().for_each(|ex| {
+                            let plugin = extends.plugins.get(ex.name.as_str()).unwrap();
 
-                        let i18n_extend = call_dynamic().unwrap();
-
-                        let i18n_extend = unsafe { Box::from_raw(i18n_extend) };
-
-                        for ex in exs {
-                            if ex.name == "i18n" {
-                                println!("{:?}", i18n_extend.build(spec.clone(), ex.args.unwrap()))
+                            let output_file = get_output_file_path(path, plugin.name());
+                            if !file_path_to_content.contains_key(&output_file) {
+                                file_path_to_content.insert(
+                                    get_output_file_path(path, plugin.name()),
+                                    plugin.header(content.pkg_name.name.as_str()),
+                                );
                             }
-                        }
-                    }
+
+                            file_path_to_content
+                                .get_mut(&output_file)
+                                .unwrap()
+                                .push_str(
+                                    &plugin.build(spec.clone(), ex.args.unwrap_or_else(|| vec![])),
+                                );
+                        });
+
+                        //println!("{:?}", file_path_to_content);
+                    });
                 }
                 _ => {}
             }
-        }
-    }
+        });
+
+        file_path_to_content
+            .iter()
+            .for_each(|(file_path, content)| {
+                fs::write(file_path, content).unwrap();
+            });
+    });
 }
 
-fn read_files_in_directory(folder_path: &Path, file_paths: &mut Vec<PathBuf>) {
+fn read_gofiles_in_directory(folder_path: &Path, file_paths: &mut Vec<PathBuf>) {
     if let Ok(entries) = fs::read_dir(folder_path) {
         for entry in entries {
             if let Ok(entry) = entry {
                 let path = entry.path();
                 if path.is_dir() {
-                    read_files_in_directory(&path, file_paths);
+                    read_gofiles_in_directory(&path, file_paths);
                 } else if let Some(extension) = path.extension() {
                     if extension == "go" {
                         file_paths.push(path.clone());
@@ -86,13 +105,12 @@ fn read_files_in_directory(folder_path: &Path, file_paths: &mut Vec<PathBuf>) {
     }
 }
 
-fn call_dynamic() -> Result<*mut dyn Extend, Box<dyn std::error::Error>> {
-    unsafe {
-        let lib = libloading::Library::new("./bin/libi18n.dylib")?;
-        let func: libloading::Symbol<unsafe extern "C" fn() -> *mut dyn Extend> =
-            lib.get(b"create_extend")?;
-
-        let ret = func();
-        Ok(ret.to_owned())
-    }
+// 活动要生成代码的文件路径
+// 例如原始文件路径为：/Users/xxx/xxx/xxx.go 生成的文件路径为：/Users/xxx/xxx/xxx_i18n.go
+fn get_output_file_path(file_path: &Path, plugin_name: &str) -> PathBuf {
+    let mut output_file_path = file_path.to_path_buf();
+    let file_name = file_path.file_name().unwrap().to_str().unwrap();
+    let file_name = file_name.replace(".go", "");
+    output_file_path.set_file_name(format!("{}_{}.go", file_name, plugin_name));
+    output_file_path
 }
