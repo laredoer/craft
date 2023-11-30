@@ -1,4 +1,5 @@
 use craft::explainer::extension::parse_extension;
+use craft::libs::validator::Validate;
 use gosyn::ast::Declaration;
 use gosyn::parse_file;
 use std::collections::HashMap;
@@ -20,6 +21,10 @@ impl Extends {
 
         let i18n = I18nExtend::new();
         e.plugins.insert(i18n.name(), Box::new(i18n));
+
+        let validator = Validate::new();
+        e.plugins.insert(validator.name(), Box::new(validator));
+
         e
     }
 }
