@@ -40,44 +40,39 @@ fn main() {
 
         let mut file_path_to_content: HashMap<PathBuf, String> = HashMap::new();
 
-        content.decl.into_iter().for_each(|decl| {
-            match decl {
-                Declaration::Type(type_decl) => {
-                    type_decl.specs.into_iter().for_each(|spec| {
-                        // 获取注释
-                        let comments = spec
-                            .clone()
-                            .docs
-                            .into_iter()
-                            .map(|s| s.text.clone())
-                            .collect::<Vec<String>>()
-                            .join(" ");
+        content.decl.into_iter().for_each(|decl| match decl {
+            Declaration::Type(type_decl) => {
+                type_decl.specs.into_iter().for_each(|spec| {
+                    let comments = spec
+                        .clone()
+                        .docs
+                        .into_iter()
+                        .map(|s| s.text.clone())
+                        .collect::<Vec<String>>()
+                        .join(" ");
 
-                        let exs = parse_extension(comments.into());
-                        exs.into_iter().for_each(|ex| {
-                            let plugin = extends.plugins.get(ex.name.as_str()).unwrap();
+                    let exs = parse_extension(comments.into());
+                    exs.into_iter().for_each(|ex| {
+                        let plugin = extends.plugins.get(ex.name.as_str()).unwrap();
 
-                            let output_file = get_output_file_path(path, plugin.name());
-                            if !file_path_to_content.contains_key(&output_file) {
-                                file_path_to_content.insert(
-                                    get_output_file_path(path, plugin.name()),
-                                    plugin.header(content.pkg_name.name.as_str()),
-                                );
-                            }
+                        let output_file = get_output_file_path(path, plugin.name());
+                        if !file_path_to_content.contains_key(&output_file) {
+                            file_path_to_content.insert(
+                                get_output_file_path(path, plugin.name()),
+                                plugin.header(content.pkg_name.name.as_str()),
+                            );
+                        }
 
-                            file_path_to_content
-                                .get_mut(&output_file)
-                                .unwrap()
-                                .push_str(
-                                    &plugin.build(spec.clone(), ex.args.unwrap_or_else(|| vec![])),
-                                );
-                        });
-
-                        //println!("{:?}", file_path_to_content);
+                        file_path_to_content
+                            .get_mut(&output_file)
+                            .unwrap()
+                            .push_str(
+                                &plugin.build(spec.clone(), ex.args.unwrap_or_else(|| vec![])),
+                            );
                     });
-                }
-                _ => {}
+                });
             }
+            _ => {}
         });
 
         file_path_to_content
