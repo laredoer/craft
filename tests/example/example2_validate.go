@@ -6,4 +6,4 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-var validate_Li90ZXN0cy9leGFtcGxlL2V4YW1wbGUuZ28 = validator.New(validator.WithRequiredStructEnabled())
+var validate_Li90ZXN0cy9leGFtcGxlL2V4YW1wbGUyLmdv = validator.New(validator.WithRequiredStructEnabled())

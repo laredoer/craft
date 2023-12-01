@@ -64,7 +64,7 @@ fn main() {
                         if !file_path_to_content.contains_key(&output_file) {
                             file_path_to_content.insert(
                                 get_output_file_path(path, plugin.name()),
-                                plugin.header(content.pkg_name.name.as_str()),
+                                plugin.header(content.pkg_name.name.as_str(), &content.path),
                             );
                         }
 
