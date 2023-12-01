@@ -226,12 +226,12 @@ fn is_infix_operator(t: &Token) -> bool {
 
 #[test]
 fn test_parse() {
-    let input = r#"#[i18n(zh-CN = "hello", code = 200), Debug]"#;
+    let input = r#"#[i18n(zh-CN = "hello", code = 200)] #[Debug]"#;
 
     let l = Lexer::new(input);
     let mut p = Parser::new(l);
 
     let stmt = p.parse_program().statements;
 
-    assert!(stmt.len() == 1);
+    assert!(stmt.len() == 2);
 }

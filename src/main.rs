@@ -111,6 +111,6 @@ fn get_output_file_path(file_path: &Path, plugin_name: &str) -> PathBuf {
     let mut output_file_path = file_path.to_path_buf();
     let file_name = file_path.file_name().unwrap().to_str().unwrap();
     let file_name = file_name.replace(".go", "");
-    output_file_path.set_file_name(format!("{}_{}.go", file_name, plugin_name));
+    output_file_path.set_file_name(format!("{}_{}.go", file_name, plugin_name.to_lowercase()));
     output_file_path
 }

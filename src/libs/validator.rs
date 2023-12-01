@@ -1,4 +1,6 @@
+use crate::explainer::extension::parse_extension;
 use crate::{explainer::extension::Field, plugin::Plugin};
+use gosyn::ast::Expression::TypeStruct;
 
 #[derive(Default, Debug)]
 pub struct Validate;
@@ -22,6 +24,29 @@ impl Plugin for Validate {
     }
 
     fn build(&self, ts: gosyn::ast::TypeSpec, args: Vec<Field>) -> String {
+        println!("{:?}", ts);
+        println!("{:?}", args);
+
+        let ss = match ts.typ {
+            TypeStruct(s) => s,
+            _ => panic!("not support type"),
+        };
+
+        let struct_type_name = ts.name.name;
+        ss.fields.iter().for_each(|f| {
+            let comments = f
+                .comments
+                .iter()
+                .map(|s| s.text.clone())
+                .collect::<Vec<String>>()
+                .join(" ");
+            println!("{:?}\n", comments);
+            let exs = parse_extension(comments);
+            println!("{:?}", exs);
+        });
+
+        println!("{}", ss.fields.len());
+
         "".to_string()
     }
 }

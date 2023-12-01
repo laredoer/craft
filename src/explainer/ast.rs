@@ -73,6 +73,13 @@ impl Expression {
                                 value: value.0,
                             });
                         }
+                        Expression::Identifier(ident) => {
+                            args.push(Field {
+                                name: ident.value.clone(),
+                                go_type: "string".to_string(),
+                                value: "".to_string(),
+                            });
+                        }
                         _ => continue,
                     }
                 }
