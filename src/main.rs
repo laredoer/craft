@@ -71,9 +71,11 @@ fn main() {
                         file_path_to_content
                             .get_mut(&output_file)
                             .unwrap()
-                            .push_str(
-                                &plugin.build(spec.clone(), ex.args.unwrap_or_else(|| vec![])),
-                            );
+                            .push_str(&plugin.build(
+                                spec.clone(),
+                                ex.args.unwrap_or_else(|| vec![]),
+                                &content.path,
+                            ));
                     });
                 });
             }

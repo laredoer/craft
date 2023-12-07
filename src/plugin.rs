@@ -10,7 +10,7 @@ pub trait Plugin {
     fn header(&self, package_name: &str, path: &PathBuf) -> String;
 
     //
-    fn build(&self, ts: TypeSpec, args: Vec<Field>) -> String;
+    fn build(&self, ts: TypeSpec, args: Vec<Field>, path: &PathBuf) -> String;
 
     // 当拓展被加载时触发该事件
     fn on_extend_load(&self) {}
