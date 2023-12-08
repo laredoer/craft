@@ -1,0 +1,6 @@
+version: '3'
+services:
+  protos:
+    image: docker.longbridge-inc.com/long-bridge-core-system/protobuf-builder:latest
+    volumes:
+      - "./:/tmp/app"

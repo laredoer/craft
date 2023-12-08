@@ -15,4 +15,6 @@ type Hello struct {
 
 	// #[Validate(required)]
 	Age int64
+
+	Addr string
 }

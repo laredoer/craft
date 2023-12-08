@@ -12,6 +12,7 @@ import (
 var validate_example = validator.New(validator.WithRequiredStructEnabled())
 
 type Hello_NameError struct{}
+
 func (Hello_NameError) Trans(ctx context.Context) error {
 	switch metautil.Language(ctx) {
 	case "zh-HK":
@@ -20,9 +21,11 @@ func (Hello_NameError) Trans(ctx context.Context) error {
 		return errors.New("参数错误，名称不能为空")
 	case "en":
 		return errors.New("Parameter error, name cannot be empty")
+	default:
+		return errors.New("參數錯誤，名稱不能為空")
 	}
-	 return nil
 }
+
 func (h *Hello) Validate(ctx context.Context) error {
 	if err := validate_example.Var(h.Name,"required,email,gte=0,lte=130,iscolor,oneof=male female prefer_not_to"); err != nil {
 		return Hello_NameError.Trans(struct{}{},ctx)

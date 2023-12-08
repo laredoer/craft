@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "example/go/proto";
+
+
+
+service Card {
+
+  rpc GetCardInfo(GetCardInfoReq) returns (GetCardInfoResp);
+}
+
+
+// #[Validate]
+message GetCardInfoReq {
+  // #[Validate(required)]
+	// #[i18n(zh-HK = "參數錯誤，卡券編號不能為空", zh-CN = "参数错误，卡券编号不能为空", en = "Parameter error, Card id cannot be empty")]
+  string card_id = 1;
+  // #[Validate(required)]
+  // #[i18n(zh-HK = "參數錯誤，名字不能為空", zh-CN = "参数错误，名字不能为空", en = "Parameter error, name cannot be empty")]
+  string first_name   = 2;       
+  string last_name = 3;
+  // #[Validate(required, gte=0, lte=130)]
+  // #[i18n(zh-HK = "參數錯誤，年齡必須在 0-130 之間", zh-CN = "参数错误，年龄必须在 0-130 之间", en = "Parameter error, age must be between 0-130")]
+	uint32 age = 4;
+  //#[Validate(required, email)]
+  // #[i18n(zh-HK = "參數錯誤，郵箱格式錯誤", zh-CN = "参数错误，邮箱格式错误", en = "Parameter error, email format error")]
+  string email = 5;
+  // #[Validate(oneof="male female prefer_not_to")]
+  string gender = 6;
+  // #[Validate(iscolor)]
+  // #[i18n(zh-HK = "參數錯誤，顏色格式錯誤", zh-CN = "参数错误，颜色格式错误", en = "Parameter error, color format error")]
+  string color = 7;
+}
+
+message GetCardInfoResp{
+
+}
