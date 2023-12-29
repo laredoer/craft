@@ -6,6 +6,8 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use indicatif::ProgressBar;
+
 use craft::libs::i18n::I18nExtend;
 use craft::plugin::Plugin;
 
@@ -39,6 +41,8 @@ fn main() {
     let mut go_file_paths: Vec<PathBuf> = Vec::new();
     read_gofiles_in_directory(&directory, &mut go_file_paths);
     let extends = Extends::new();
+
+    let pb = ProgressBar::new(go_file_paths.len() as u64);
 
     go_file_paths.iter().for_each(|path| {
         let content = parse_file(path).unwrap();
@@ -87,7 +91,10 @@ fn main() {
             .for_each(|(file_path, content)| {
                 fs::write(file_path, content).unwrap();
             });
+
+        pb.inc(1);
     });
+    pb.finish_with_message("done");
 }
 
 fn read_gofiles_in_directory(folder_path: &Path, file_paths: &mut Vec<PathBuf>) {

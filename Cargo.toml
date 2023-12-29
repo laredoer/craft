@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 gosyn = "0.2.5"
 base64 = "0.21.5"
+indicatif = "0.17.7"
